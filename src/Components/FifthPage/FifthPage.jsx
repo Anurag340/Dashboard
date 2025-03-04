@@ -8,6 +8,7 @@ import axios from 'axios';
 import { Buffer } from 'buffer';
 window.Buffer = Buffer;
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import Modal from '../Modal/Modal'
 
 const s3 = new S3Client({
   region: 'ap-south-1',
@@ -21,6 +22,8 @@ const Fifth = () => {
   const [indvid, setindvid] = useState("");
   const [indvdata, setindvdata] = useState({});
   const [file, setFile] = useState(null); // Store selected file
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -31,7 +34,8 @@ const Fifth = () => {
 
   const uploadFile = async () => {
     if (!file) {
-      console.error("No file selected");
+      setModalMessage("No file selected");
+      setShowModal(true);
       return;
     }
 
@@ -50,15 +54,18 @@ const Fifth = () => {
         const command = new PutObjectCommand(params);
         await s3.send(command);
 
-        console.log("File uploaded successfully!");
-        alert("Image uploaded successfully");
+        setModalMessage("Image uploaded successfully!");
+        setShowModal(true);
+        setFile(null); // Reset file input
       };
 
       reader.onerror = () => {
-        console.error("File reading failed");
+        setModalMessage("File reading failed");
+        setShowModal(true);
       };
     } catch (error) {
-      console.error("Upload failed", error);
+      setModalMessage("Upload failed: " + error.message);
+      setShowModal(true);
     }
   };
 
@@ -72,6 +79,10 @@ const Fifth = () => {
         console.log(error);
       });
     setindvid('');
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
   };
 
   const navigate = useNavigate();
@@ -141,6 +152,11 @@ const Fifth = () => {
       </div>
 
       <div className='w-[40%] h-[1px] bg-zinc-300'></div>
+      <Modal 
+        isOpen={showModal}
+        onClose={handleModalClose}
+        message={modalMessage}
+      />
     </div>
   );
 };

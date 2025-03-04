@@ -2,27 +2,30 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './FirstPage.css'
 import axios from 'axios'
+import Modal from '../Modal/Modal'
 
 const FirstPage = () => {
     const navigate = useNavigate();
     const [login,setlogin] = useState('');
     const [orgname,setorgname] = useState('');
     const [orgloc,setorgloc] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
 
     const handlelogin = async(e) => {
         e.preventDefault();
         try {
-           const orgid = login;
+            const orgid = login;
             const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/org-login`, { params: { orgid } });
             if (response.status === 200 || response.status == "OK") {
                 localStorage.setItem('orgid', response.data.orgid);
                 setlogin(0);
-                alert("Successfully logged in");
-                navigate('/login');
+                setModalMessage("Successfully logged in");
+                setShowModal(true);
             }
             else{
-                alert("Invalid credentials");
-                navigate('/');
+                setModalMessage("Invalid credentials");
+                setShowModal(true);
             }
         } catch (error) {
             console.error('Error logging in:', error);
@@ -36,17 +39,25 @@ const FirstPage = () => {
             if (response.status === 200) {
                 const orgid = response.data.orgid;
                 localStorage.setItem('orgid', orgid);
-                alert(`Successfully registered : Orgid - ${orgid} `);
+                setModalMessage(`Successfully registered : Orgid - ${orgid}`);
+                setShowModal(true);
                 setorgname('');
                 setorgloc('');
-                navigate('/login');
             } else {
-                alert("Registration failed");
+                setModalMessage("Registration failed");
+                setShowModal(true);
             }
         } catch (error) {
             console.error('Error registering:', error);
         }
     }
+
+    const handleModalClose = () => {
+        setShowModal(false);
+        if (modalMessage.includes("Successfully")) {
+            navigate('/login');
+        }
+    };
 
   return (
     <div className='firstpage h-screen w-full flex flex-col relative '>
@@ -91,6 +102,11 @@ const FirstPage = () => {
                 </div>
             </div>
         </div>
+        <Modal 
+            isOpen={showModal}
+            onClose={handleModalClose}
+            message={modalMessage}
+        />
     </div>
   )
 }

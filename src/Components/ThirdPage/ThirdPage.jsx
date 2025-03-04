@@ -3,6 +3,7 @@ import Back from '../Back/Back'
 import { useNavigate } from 'react-router-dom'
 import './ThirdPage.css'
 import axios from 'axios'
+import Modal from '../Modal/Modal'
 
 const ThirdPage = () => {
     const navigate = useNavigate();
@@ -10,36 +11,50 @@ const ThirdPage = () => {
     const [gender, setGender] = useState('');
     const [age, setAge] = useState('');
     const [bloodGroup, setBloodGroup] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
 
     const handleSubmit = async(e) => {
         e.preventDefault();
         const orgid = localStorage.getItem('orgid');
 
-        const userData ={
+        const userData = {
             name: name,
             gender: gender,
             age: age,
             bld: bloodGroup,
-            orgid:orgid
+            orgid: orgid
         };
 
-         const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/individual-register`, userData);
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/individual-register`, userData);
 
-         if(response.status == 200 || response.status == "OK"){
-             alert(`Data submitted successfully : Indvid : ${response.data.indvid}`);
-         }
-         else{
-             alert('Failed to submit data');
-         }
+            if(response.status === 200 || response.status === "OK") {
+                setModalMessage(`Data submitted successfully : Indvid : ${response.data.indvid}`);
+                setShowModal(true);
+            } else {
+                setModalMessage('Failed to submit data');
+                setShowModal(true);
+            }
 
-        setName('');
-        setGender('');
-        setAge('');
-        setBloodGroup('');
+            setName('');
+            setGender('');
+            setAge('');
+            setBloodGroup('');
+        } catch (error) {
+            setModalMessage('Error submitting data');
+            setShowModal(true);
+        }
     }
 
+    const handleModalClose = () => {
+        setShowModal(false);
+        if (modalMessage.includes("successfully")) {
+        }
+    };
+
     return (
-        <div className='h-screen w-full relative flex justify-center items-center ' >
+        <div className='h-screen w-full relative flex justify-center items-center'>
             <Back />
             <div className='maindiv h-[80%] w-[50%] flex flex-col justify-center items-center ' >
                 <div className='h-[1px] w-[60%] bg-zinc-300 lining '></div>
@@ -101,7 +116,11 @@ const ThirdPage = () => {
                 </div>
 
             </div>
-
+            <Modal 
+                isOpen={showModal}
+                onClose={handleModalClose}
+                message={modalMessage}
+            />
         </div>
     )
 }
