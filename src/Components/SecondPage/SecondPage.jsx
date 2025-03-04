@@ -7,11 +7,11 @@ import axios from 'axios';
 
 const SecondPage = () => {
   const navigate = useNavigate();
-  const [unitNo, setUnitNo] = useState('');
+  const [unitno, setunitno] = useState('');
   const [department, setDepartment] = useState('');
   const [teams, setTeams] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
-  const orgId = 1;
+  const orgid = localStorage.getItem('orgid');
 
   useEffect(() => {
     fetchTeams();
@@ -19,7 +19,9 @@ const SecondPage = () => {
 
   const fetchTeams = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/Dashboard/get-teams', { params: { orgId } });
+      console.log(orgid)
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/get-teams`, { params: { orgid } });
+      console.log(response.data);
       setTeams(response.data);
     } catch (error) {
       console.error('Error fetching teams:', error);
@@ -30,35 +32,31 @@ const SecondPage = () => {
     setSelectedTeam(selectedTeam?.id === team.id ? null : team);
   };
 
-  const handleProceed = async () => {
+  const handleProceed =() => {
     if (!selectedTeam) {
       alert("Please select a team.");
       return;
     }
 
-    try {
-      await axios.post('http://localhost:8080/Dashboard/register-team', {
-        teamId: selectedTeam.id
-      });
+    console.log(selectedTeam);
+    const { unitno, department, orgid } = selectedTeam;
+    
+      axios.post(`${import.meta.env.VITE_BASE_URL}/register-team`, {unitno, department, orgid});
       alert("Team successfully registered!");
       navigate('/individual-register');
-    } catch (error) {
-      alert("Error registering team.");
-      console.error(error);
-    }
   };
 
   const handleAddTeam = async (e) => {
     e.preventDefault();
-    if (!unitNo || !department) {
+    if (!unitno || !department) {
       alert("Both fields are required to add a team.");
       return;
     }
 
     try {
-      await axios.post('http://localhost:8080/Dashboard/add-team', { unitNo, department });
+      await axios.post(`${import.meta.env.VITE_BASE_URL}/add-team`, { unitno, department,orgid });
       alert("Team added successfully.");
-      setUnitNo('');
+      setunitno('');
       setDepartment('');
       fetchTeams(); // Refresh team list
     } catch (error) {
@@ -96,10 +94,10 @@ const SecondPage = () => {
                 <p>Unit No :</p>
                 <input 
                   placeholder='  Enter unit no' 
-                  className='inputs bg-zinc-200 rounded-md mt-[.5vh]' 
+                  className='inputs bg-zinc-200 text-black rounded-md mt-[.5vh]' 
                   type="text" 
-                  value={unitNo} 
-                  onChange={(e) => setUnitNo(e.target.value)} 
+                  value={unitno} 
+                  onChange={(e) => setunitno(e.target.value)} 
                 />
               </label>
 
@@ -108,7 +106,7 @@ const SecondPage = () => {
                 <input 
                   type="text" 
                   placeholder='  Enter department' 
-                  className='inputs bg-zinc-200 rounded-md mt-[.5vh]' 
+                  className='inputs bg-zinc-200 text-black rounded-md mt-[.5vh]' 
                   value={department} 
                   onChange={(e) => setDepartment(e.target.value)} 
                 />

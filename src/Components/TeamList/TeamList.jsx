@@ -7,7 +7,7 @@ const TeamList = ({ item, selectedTeam, handleCheckboxChange }) => {
         <div className='h-full w-[90%] bg-blue-600 flex justify-around items-center rounded-md'>
             <GrGroup />
             <p>Department - {item.department}</p>
-            <p>Unit - {item.unitNo}</p>
+            <p>Unit - {item.unitno}</p>
         </div>
         <input 
           type="checkbox" 

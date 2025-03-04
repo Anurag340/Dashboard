@@ -13,18 +13,20 @@ const ThirdPage = () => {
 
     const handleSubmit = async(e) => {
         e.preventDefault();
+        const orgid = localStorage.getItem('orgid');
 
         const userData ={
             name: name,
             gender: gender,
             age: age,
-            bloodGroup: bloodGroup
+            bld: bloodGroup,
+            orgid:orgid
         };
 
-         const response = await axios.post('http://localhost:8080/Dashboard/individual-register',userData);
+         const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/individual-register`, userData);
 
-         if(response.status == 200){
-             alert('Data submitted successfully');
+         if(response.status == 200 || response.status == "OK"){
+             alert(`Data submitted successfully : Indvid : ${response.data.indvid}`);
          }
          else{
              alert('Failed to submit data');
@@ -50,6 +52,7 @@ const ThirdPage = () => {
                     <label>
                         <span>Gender : </span>
                         <select onChange={(e) => setGender(e.target.value)} value={gender} className='text-black rounded-md ml-[0.4vw] ' name="" id="">
+                            <option value="" disabled>Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                             <option value="Others">Others</option>
@@ -63,6 +66,7 @@ const ThirdPage = () => {
                     <label>
                         <span>Bld Gr : </span>
                         <select onChange={(e) => setBloodGroup(e.target.value)} value={bloodGroup} className=' text-black bldinput rounded-md ml-[0.9vw] w-[3vw] ' name="" id="">
+                            <option value="" disabled>Select Blood Group</option>
                             <option value="A+">A+</option>
                             <option value="A-">A-</option>
                             <option value="B+">B+</option>
