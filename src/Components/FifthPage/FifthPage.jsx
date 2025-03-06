@@ -38,6 +38,8 @@ const Fifth = () => {
       setShowModal(true);
       return;
     }
+    console.log(file.name);
+    console.log(indvid);
 
     try {
       const reader = new FileReader();
@@ -46,7 +48,7 @@ const Fifth = () => {
       reader.onload = async () => {
         const params = {
           Bucket: 'luxy.smile',
-          Key: file.name,
+          Key: `registrations/${indvid}_${file.name}`,
           Body: reader.result,
           ContentType: file.type,
         };
@@ -54,6 +56,12 @@ const Fifth = () => {
         const command = new PutObjectCommand(params);
         await s3.send(command);
 
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/update-img`, {
+          indvid,
+          imgname: `${indvid}_${file.name}` // Using original filename without prefix
+        });
+
+        console.log(response);
         setModalMessage("Image uploaded successfully!");
         setShowModal(true);
         setFile(null); // Reset file input
@@ -67,6 +75,8 @@ const Fifth = () => {
       setModalMessage("Upload failed: " + error.message);
       setShowModal(true);
     }
+    setindvid('');
+    setindvdata({});
   };
 
   const handleSubmit = (e) => {
@@ -78,7 +88,7 @@ const Fifth = () => {
       .catch(error => {
         console.log(error);
       });
-    setindvid('');
+   
   };
 
   const handleModalClose = () => {
