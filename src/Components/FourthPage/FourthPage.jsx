@@ -65,9 +65,6 @@ const FourthPage = () => {
 
     const handleModalClose = () => {
         setShowModal(false);
-        if (modalMessage.includes('registered successfully')) {
-            navigate('/img-upload');
-        }
     };
 
     return (
