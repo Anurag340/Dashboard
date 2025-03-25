@@ -87,15 +87,43 @@ const SixthPage = () => {
 
   const handlesubmit = (e) => {
     e.preventDefault();
-    axios.get(`${import.meta.env.VITE_BASE_URL}/get-individual-details`, { params: { indvid } })
+    axios.get(`${import.meta.env.VITE_BASE_URL}/get-img`, { params: { indvid } })
       .then(response => {
-        setIndvdata(response.data);
+        const imgUrl = `https://luxy.smile.s3.ap-south-1.amazonaws.com/registrations/${response.data.imgname}`;
+        console.log(imgUrl);
+        setIndvdata({ imgUrl });
       })
       .catch(error => {
-        setModalMessage("Error fetching individual details");
+        setModalMessage("Error fetching image");
         setShowModal(true);
         console.error(error);
       });
+  };
+
+  const handleDownload = async () => {
+    if (indvdata.imgUrl) {
+      try {
+        const response = await fetch(indvdata.imgUrl, { method: 'GET' });
+        if (!response.ok) {
+          throw new Error("Failed to fetch the file");
+        }
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'individual_image.jpg'); // Set the file name
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url); // Clean up the URL object
+      } catch (error) {
+        setModalMessage("Failed to download image");
+        setShowModal(true);
+      }
+    } else {
+      setModalMessage("No image available to download");
+      setShowModal(true);
+    }
   };
 
   return (
@@ -113,18 +141,28 @@ const SixthPage = () => {
           <button type="submit" className='p-1 px-2 text-white bg-blue-600 rounded'>Go</button>
         </form>
         <div className='text-white bg-blue-800 p-4 w-fit rounded-md'>
-          <p>Name : {indvdata.name || 'N/A'}</p>
-          <p>Orgname : {indvdata.orgname || 'N/A'}</p>
-          <p>Department : {indvdata.department || 'N/A'}</p>
+          {indvdata.imgUrl ? (
+            <>
+              <img src={indvdata.imgUrl} alt="Individual" className='w-80 h-48 object-cover rounded-md' />
+              <button 
+                onClick={handleDownload} 
+                className='mt-2 inline-block text-blue-400 underline'
+              >
+                Download Image
+              </button>
+            </>
+          ) : (
+            <p>No image available</p>
+          )}
         </div>
       </div>
 
       <div className='flex flex-col justify-center items-center gap-[2vw]'>
         <p className='text-white font-light text-lg'>You can upload your PDF file below :</p>
-        <div className='flex justify-center items-center gap-[1vw]'>
+        <div className='flex flex-col w-full justify-center items-center gap-[1vw]'>
           <input 
             type="file" 
-            className='w-[6.5vw] font-light rounded-md'
+            className='text-white ml-14 font-light rounded-md'
             accept="application/pdf"
             onChange={handleFileChange}
           />
@@ -139,10 +177,10 @@ const SixthPage = () => {
 
       <button 
         onClick={() => window.location.href = '/records'} 
-        className='p-[.2vh] px-[1vh] bg-white text-zinc-800 text-sm rounded-full flex justify-center items-center '
+        className='p-[.2vh] px-[1vh] h-8 bg-white text-zinc-800 text rounded-full flex justify-center items-center '
       >
         Show all records
-        <MdArrowRightAlt size={20} />
+        <MdArrowRightAlt size={25} />
       </button>
 
       <Modal 

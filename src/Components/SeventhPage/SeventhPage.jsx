@@ -7,15 +7,17 @@ import { MdFilterList } from "react-icons/md";
 import ExportList from './ExportList';
 import Papa from 'papaparse';
 
-const orgid = localStorage.getItem('orgid');
 const SeventhPage = () => {
   const [records, setRecords] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [orgid, setOrgid] = useState(''); // Added state for orgid
 
   useEffect(() => {
+    if (!orgid) return; // Fetch records only if orgid is provided
+
     const fetchRecords = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/get-records` , {params :{orgid}} );
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/get-records`, { params: { orgid } });
         setRecords(response.data);
       } catch (error) {
         console.error('Error fetching records:', error);
@@ -23,7 +25,7 @@ const SeventhPage = () => {
     };
 
     fetchRecords();
-  }, []);
+  }, [orgid]); // Added orgid as a dependency
 
   const filteredRecords = records.filter(record => {
     const searchFields = [
@@ -84,6 +86,17 @@ const SeventhPage = () => {
                   Export CSV <CiExport/> 
                 </button>
 
+            </div>
+
+            {/* Added input field for orgid */}
+            <div className='w-full flex justify-center items-center gap-[1vw]'>
+              <input
+                type="text"
+                placeholder='Enter Organization ID'
+                className='bg-zinc-300 rounded-lg px-2'
+                value={orgid}
+                onChange={(e) => setOrgid(e.target.value)}
+              />
             </div>
 
             <div className='flex flex-col w-full gap-[2vw]'>
