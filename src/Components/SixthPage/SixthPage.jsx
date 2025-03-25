@@ -88,40 +88,43 @@ const SixthPage = () => {
   const handlesubmit = (e) => {
     e.preventDefault();
     axios.get(`${import.meta.env.VITE_BASE_URL}/get-img`, { params: { indvid } })
-      .then(response => {
-        const imgUrl = `https://luxy.smile.s3.ap-south-1.amazonaws.com/registrations/${response.data.imgname}`;
-        console.log(imgUrl);
-        setIndvdata({ imgUrl });
+      .then(async (response) => {
+        const imgData = response.data; // Assuming the API returns an array of objects
+        if (Array.isArray(imgData) && imgData.length > 0) {
+          const imgUrls = imgData
+            .filter(item => item.imgname) // Ensure imgname exists
+            .map(item => 
+              `https://luxy.smile.s3.ap-south-1.amazonaws.com/registrations/${item.imgname}`
+            );
+          setIndvdata({ imgUrls });
+        } else {
+          setIndvdata({ imgUrls: [] }); // Set an empty array if no images are returned
+        }
       })
       .catch(error => {
-        setModalMessage("Error fetching image");
+        setModalMessage("Error fetching images");
         setShowModal(true);
         console.error(error);
       });
   };
 
-  const handleDownload = async () => {
-    if (indvdata.imgUrl) {
-      try {
-        const response = await fetch(indvdata.imgUrl, { method: 'GET' });
-        if (!response.ok) {
-          throw new Error("Failed to fetch the file");
-        }
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'individual_image.jpg'); // Set the file name
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(url); // Clean up the URL object
-      } catch (error) {
-        setModalMessage("Failed to download image");
-        setShowModal(true);
+  const handleDownload = async (imgUrl, fileName) => {
+    try {
+      const response = await fetch(imgUrl, { method: 'GET' });
+      if (!response.ok) {
+        throw new Error("Failed to fetch the file");
       }
-    } else {
-      setModalMessage("No image available to download");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName); // Set the file name
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url); // Clean up the URL object
+    } catch (error) {
+      setModalMessage("Failed to download image");
       setShowModal(true);
     }
   };
@@ -141,18 +144,22 @@ const SixthPage = () => {
           <button type="submit" className='p-1 px-2 text-white bg-blue-600 rounded'>Go</button>
         </form>
         <div className='text-white bg-blue-800 p-4 w-fit rounded-md'>
-          {indvdata.imgUrl ? (
-            <>
-              <img src={indvdata.imgUrl} alt="Individual" className='w-80 h-48 object-cover rounded-md' />
-              <button 
-                onClick={handleDownload} 
-                className='mt-2 inline-block text-blue-400 underline'
-              >
-                Download Image
-              </button>
-            </>
+          {Array.isArray(indvdata.imgUrls) && indvdata.imgUrls.length > 0 ? (
+            <div className='grid grid-cols-3 gap-4'>
+              {indvdata.imgUrls.map((imgUrl, index) => (
+                <div key={index} className='flex flex-col items-center mb-4'>
+                  <img src={imgUrl} alt={`Individual ${index + 1}`} className='w-72 h-48 object-cover rounded-md' />
+                  <button 
+                    onClick={() => handleDownload(imgUrl, `individual_image_${index + 1}.jpg`)} 
+                    className='mt-2 inline-block text-blue-400 underline'
+                  >
+                    Download Image {index + 1}
+                  </button>
+                </div>
+              ))}
+            </div>
           ) : (
-            <p>No image available</p>
+            <p>No images available</p>
           )}
         </div>
       </div>
