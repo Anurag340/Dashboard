@@ -10,19 +10,41 @@ const ThirdPage = () => {
     const [name, setName] = useState('');
     const [gender, setGender] = useState('');
     const [age, setAge] = useState('');
-    const [bloodGroup, setBloodGroup] = useState('');
+    const [email, setEmail] = useState('');
+    const [contactNo, setContactNo] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
 
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const validateContactNo = (contactNo) => {
+        const contactRegex = /^[0-9]{10}$/;
+        return contactRegex.test(contactNo);
+    };
+
     const handleSubmit = async(e) => {
         e.preventDefault();
+        if (!validateEmail(email)) {
+            setModalMessage('Invalid email address');
+            setShowModal(true);
+            return;
+        }
+        if (!validateContactNo(contactNo)) {
+            setModalMessage('Invalid contact number');
+            setShowModal(true);
+            return;
+        }
         const orgid = localStorage.getItem('orgid');
 
         const userData = {
             name: name,
             gender: gender,
             age: age,
-            bld: bloodGroup,
+            email: email,
+            contactno: contactNo,
             orgid: orgid
         };
 
@@ -40,7 +62,8 @@ const ThirdPage = () => {
             setName('');
             setGender('');
             setAge('');
-            setBloodGroup('');
+            setEmail('');
+            setContactNo('');
         } catch (error) {
             setModalMessage('Error submitting data');
             setShowModal(true);
@@ -79,18 +102,11 @@ const ThirdPage = () => {
                     </label>
 
                     <label>
-                        <span>Bld Gr : </span>
-                        <select onChange={(e) => setBloodGroup(e.target.value)} value={bloodGroup} className=' text-black bldinput rounded-md ml-[0.9vw] w-fit ' name="" id="" required>
-                            <option value="" disabled>Select Blood Group</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                        </select>
+                        <span>Email : </span><input onChange={(e) => setEmail(e.target.value)} value={email} className='text-black ml-[1vw] rounded-md' placeholder=' Enter Email' type="email" required />
+                    </label>
+
+                    <label>
+                        <span>Contact : </span><input onChange={(e) => setContactNo(e.target.value)} value={contactNo} className='text-black ml-[1vw] rounded-md' placeholder=' Enter Contact No' type="text" required />
                     </label>
 
                     <button className='bg-white w-[5vw] registerbutton rounded-full text-black '>Register</button>
