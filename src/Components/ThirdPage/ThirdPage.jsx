@@ -61,12 +61,12 @@ const ThirdPage = () => {
                 <form onSubmit={(e) => handleSubmit(e)} className='formidiv w-[60%] flex flex-col gap-[3vh] pl-[7vw] py-[3vw] justify-center text-white ' action="">
 
                     <label>
-                        <span>Name : </span><input onChange={(e) => setName(e.target.value)} value={name} className='text-black ml-[1vw] rounded-md' placeholder=' Enter Name' type="text" />
+                        <span>Name : </span><input onChange={(e) => setName(e.target.value)} value={name} className='text-black ml-[1vw] rounded-md' placeholder=' Enter Name' type="text" required />
                     </label>
 
                     <label>
                         <span>Gender : </span>
-                        <select onChange={(e) => setGender(e.target.value)} value={gender} className='text-black rounded-md ml-[0.4vw] ' name="" id="">
+                        <select onChange={(e) => setGender(e.target.value)} value={gender} className='text-black rounded-md ml-[0.4vw] ' name="" id="" required>
                             <option value="" disabled>Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -75,12 +75,12 @@ const ThirdPage = () => {
                     </label>
 
                     <label>
-                        <span>Age : </span><input onChange={(e) => setAge(e.target.value)} value={age} className='w-[3vw] ageinput text-black rounded-md ml-[2vw] ' type="number" placeholder='  Age' />
+                        <span>Age : </span><input onChange={(e) => setAge(e.target.value)} value={age} className='w-[20%] ageinput text-black rounded-md ml-[2vw] ' type="number" placeholder='  Age' required />
                     </label>
 
                     <label>
                         <span>Bld Gr : </span>
-                        <select onChange={(e) => setBloodGroup(e.target.value)} value={bloodGroup} className=' text-black bldinput rounded-md ml-[0.9vw] w-[3vw] ' name="" id="">
+                        <select onChange={(e) => setBloodGroup(e.target.value)} value={bloodGroup} className=' text-black bldinput rounded-md ml-[0.9vw] w-fit ' name="" id="" required>
                             <option value="" disabled>Select Blood Group</option>
                             <option value="A+">A+</option>
                             <option value="A-">A-</option>

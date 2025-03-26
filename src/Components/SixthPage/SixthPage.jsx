@@ -94,7 +94,7 @@ const SixthPage = () => {
           const imgUrls = imgData
             .filter(item => item.imgname) // Ensure imgname exists
             .map(item => 
-              `https://luxy.smile.s3.ap-south-1.amazonaws.com/registrations/${item.imgname}`
+              `https://s3.ap-south-1.amazonaws.com/luxy.smile/registrations/${item.imgname}`
             );
           setIndvdata({ imgUrls });
         } else {
@@ -103,6 +103,20 @@ const SixthPage = () => {
       })
       .catch(error => {
         setModalMessage("Error fetching images");
+        setShowModal(true);
+        console.error(error);
+      });
+
+    // Fetch individual details
+    axios.get(`${import.meta.env.VITE_BASE_URL}/get-individual-details`, { params: { indvid } })
+      .then(response => {
+        const individualDetails = response.data;
+        console.log(individualDetails) // Assuming the API returns individual details
+        setIndvdata(prevData => ({ ...prevData, details: individualDetails }));
+        console.log(indvdata);
+      })
+      .catch(error => {
+        setModalMessage("Error fetching individual details");
         setShowModal(true);
         console.error(error);
       });
@@ -144,6 +158,16 @@ const SixthPage = () => {
           <button type="submit" className='p-1 px-2 text-white bg-blue-600 rounded'>Go</button>
         </form>
         <div className='text-white bg-blue-800 p-4 w-fit rounded-md'>
+          {indvdata.details ? (
+            <div className='mb-4'>
+              <p><strong>Name:</strong> {indvdata.details.name || 'N/A'}</p>
+              <p><strong>Department:</strong> {indvdata.details.department || 'N/A'}</p>
+              <p><strong>Unit No:</strong> {indvdata.details.unitno || 'N/A'}</p>
+              <p><strong>Organization:</strong> {indvdata.details.orgname || 'N/A'}</p>
+            </div>
+          ) : (
+            <p>No individual details available</p>
+          )}
           {Array.isArray(indvdata.imgUrls) && indvdata.imgUrls.length > 0 ? (
             <div className='grid grid-cols-3 gap-4'>
               {indvdata.imgUrls.map((imgUrl, index) => (

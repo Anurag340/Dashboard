@@ -29,6 +29,8 @@ const FirstPage = () => {
             }
         } catch (error) {
             console.error('Error logging in:', error);
+            setModalMessage(`Error logging in: ${error.message}`);
+            setShowModal(true);
         }
     }
 
@@ -49,6 +51,8 @@ const FirstPage = () => {
             }
         } catch (error) {
             console.error('Error registering:', error);
+            setModalMessage(`Error registering: ${error.response.data}`);
+            setShowModal(true);
         }
     }
 
@@ -65,7 +69,7 @@ const FirstPage = () => {
         <div className='h-full w-full flex justify-center items-center'>
             <div className=' herotext w-[50%] h-full flex flex-col justify-center items-start pl-[8vw] gap-[1vh]' >
                 <p className='text-8xl text-white font-medium' >WE ARE</p>
-                <p className='text-8xl text-white font-medium' >ORALENS</p>
+                <p className='text-8xl text-white font-medium' >LuxySmile</p>
             </div>
 
             <div className='bar h-[80%] w-[1px] bg-white ' ></div>

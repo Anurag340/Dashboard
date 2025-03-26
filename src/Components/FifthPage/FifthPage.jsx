@@ -147,6 +147,7 @@ const Fifth = () => {
                 type="file"
                 className='imginput w-[11vw] text-xs'
                 onChange={handleFileChange}
+                disabled={!indvid} // Disable file input if indvid is not entered
               />
             </div>
           </div>
@@ -155,6 +156,7 @@ const Fifth = () => {
             type="button"
             onClick={uploadFile} // Upload on button click
             className='p-[.2vh] px-[1vh] uploadimgbutton rounded-full bg-white text-black'
+            disabled={!indvid || !file} // Disable button if indvid or file is not provided
           >
             Upload Img
           </button>
