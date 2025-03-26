@@ -87,38 +87,39 @@ const SixthPage = () => {
 
   const handlesubmit = (e) => {
     e.preventDefault();
-    axios.get(`${import.meta.env.VITE_BASE_URL}/get-img`, { params: { indvid } })
-      .then(async (response) => {
-        const imgData = response.data; // Assuming the API returns an array of objects
-        if (Array.isArray(imgData) && imgData.length > 0) {
-          const imgUrls = imgData
-            .filter(item => item.imgname) // Ensure imgname exists
-            .map(item => 
-              `https://s3.ap-south-1.amazonaws.com/luxy.smile/registrations/${item.imgname}`
-            );
-          setIndvdata({ imgUrls });
-        } else {
-          setIndvdata({ imgUrls: [] }); // Set an empty array if no images are returned
-        }
-      })
-      .catch(error => {
-        setModalMessage("Error fetching images");
-        setShowModal(true);
-        console.error(error);
-      });
 
-    // Fetch individual details
+    // Fetch individual details first
     axios.get(`${import.meta.env.VITE_BASE_URL}/get-individual-details`, { params: { indvid } })
       .then(response => {
-        const individualDetails = response.data;
-        console.log(individualDetails) // Assuming the API returns individual details
+        const individualDetails = response.data; // Assuming the API returns individual details
         setIndvdata(prevData => ({ ...prevData, details: individualDetails }));
-        console.log(indvdata);
       })
       .catch(error => {
         setModalMessage("Error fetching individual details");
         setShowModal(true);
         console.error(error);
+      })
+      .finally(() => {
+        // Fetch images after individual details
+        axios.get(`${import.meta.env.VITE_BASE_URL}/get-img`, { params: { indvid } })
+          .then(async (response) => {
+            const imgData = response.data; // Assuming the API returns an array of objects
+            if (Array.isArray(imgData) && imgData.length > 0) {
+              const imgUrls = imgData
+                .filter(item => item.imgname) // Ensure imgname exists
+                .map(item => 
+                  `https://s3.ap-south-1.amazonaws.com/luxy.smile/registrations/${item.imgname}`
+                );
+              setIndvdata(prevData => ({ ...prevData, imgUrls }));
+            } else {
+              setIndvdata(prevData => ({ ...prevData, imgUrls: [] })); // Set an empty array if no images are returned
+            }
+          })
+          .catch(error => {
+            setModalMessage("Error fetching images");
+            setShowModal(true);
+            console.error(error);
+          });
       });
   };
 
